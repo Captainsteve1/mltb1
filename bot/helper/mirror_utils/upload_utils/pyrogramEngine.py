@@ -152,7 +152,7 @@ class TgUploader:
                                                                  disable_notification=True,
                                                                  reply_markup=self.__button,
                                                                  progress=self.__upload_progress)
-            if self.__listener.dmMessage:
+            if self.__listener.dmMessage and self.__sent_DMmsg:
                 if IS_USER_SESSION:
                     self.__sent_DMmsg = self.__listener.bot.copy_message(
                     chat_id=self.__listener.message.from_user.id,
@@ -206,13 +206,16 @@ class TgUploader:
         if DUMP_CHAT:= config_dict['DUMP_CHAT']:
             msg = self.__listener.message.text if self.__listener.isPrivate else self.__listener.message.link
             self.__sent_msg = app.send_message(DUMP_CHAT, msg, disable_web_page_preview=True)
-            if self.__listener.dmMessage:
-                if IS_USER_SESSION:
-                    self.__sent_DMmsg = {'message_id' : self.__listener.dmMessage.message_id}
-                else:
-                    self.__sent_DMmsg = app.get_messages(self.__listener.message.from_user.id, self.__listener.dmMessage.message_id)
+            if self.__listener.dmMessage and IS_USER_SESSION:
+                self.__sent_DMmsg = {'message_id' : self.__listener.dmMessage.message_id}
+            elif self.__listener.dmMessage:
+                self.__sent_DMmsg = app.get_messages(self.__listener.message.from_user.id, self.__listener.dmMessage.message_id)
+        elif self.__listener.dmMessage and not IS_USER_SESSION:
+            self.__sent_msg = app.get_messages(self.__listener.message.from_user.id, self.__listener.dmMessage.message_id)
+            self.__sent_DMmsg = None
         else:
             self.__sent_msg = app.get_messages(self.__listener.message.chat.id, self.__listener.uid)
+            self.__sent_DMmsg = None
         if self.__listener.message.chat.type != 'private' and not self.__listener.dmMessage:
             self.__button = InlineKeyboardMarkup([[InlineKeyboardButton(text='Save Message', callback_data="save")]])
 

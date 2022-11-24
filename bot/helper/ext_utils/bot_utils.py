@@ -21,17 +21,17 @@ PAGES = 0
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Uploading..."
-    STATUS_DOWNLOADING = "Downloading..."
-    STATUS_CLONING = "Cloning..."
-    STATUS_WAITING = "Queued..."
-    STATUS_PAUSED = "Paused..."
-    STATUS_ARCHIVING = "Archiving..."
-    STATUS_EXTRACTING = "Extracting..."
-    STATUS_SPLITTING = "Splitting..."
-    STATUS_CHECKING = "CheckingUp..."
-    STATUS_SEEDING = "Seeding..."
-    STATUS_CONVERTING = "Converting..."
+    STATUS_UPLOADING = "Uploading."
+    STATUS_DOWNLOADING = "Downloading."
+    STATUS_CLONING = "Cloning."
+    STATUS_WAITING = "Queued."
+    STATUS_PAUSED = "Paused."
+    STATUS_ARCHIVING = "Archiving."
+    STATUS_EXTRACTING = "Extracting."
+    STATUS_SPLITTING = "Splitting."
+    STATUS_CHECKING = "CheckingUp."
+    STATUS_SEEDING = "Seeding."
+    STATUS_CONVERTING = "Converting."
 
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
@@ -131,8 +131,7 @@ def get_readable_message():
                 globals()['COUNT'] -= STATUS_LIMIT
                 globals()['PAGE_NO'] -= 1
         for index, download in enumerate(list(download_dict.values())[COUNT:], start=1):
-            msg += f"<code>{escape(str(download.name()))}</code>"
-            msg += f"\n<b>Status</b>: <i>{download.status()}</i>"
+            msg += f"<i><b>{download.status()}</b></i>: <code>{escape(str(download.name()))}</code>"
             if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_CONVERTING]:
                 msg += f"\n{get_progress_bar_string(download)} {download.progress()}"
                 msg += f"\n<b>Processed</b>: {get_readable_file_size(download.processed_bytes())} of {download.size()}"
@@ -154,8 +153,7 @@ def get_readable_message():
             msg += f"\n<b>Elapsed</b>: {get_readable_time(time() - download.message.date.timestamp())}"
             if hasattr(download, 'playList'):
                 try:
-                    playlist = download.playList()
-                    if playlist:
+                    if playlist:=download.playList():
                         msg += f"\n<b>Playlist</b>: {playlist}"
                 except:
                     pass
@@ -199,6 +197,7 @@ def get_readable_message():
             button = buttons.build_menu(3)
             return msg + bmsg, button
         return msg + bmsg, ""
+
 def turn(data):
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     try:
